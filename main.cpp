@@ -38,7 +38,7 @@ int main()
 	std::cin >> threshold;
 	seg.setThreshold(threshold);
 	
-	std::cout << "------------------------输入拟合方法---------------------" << std::endl;
+//	std::cout << "------------------------输入拟合方法---------------------" << std::endl;
 //	std::cout << "------------------------0：RANSAC---------------------" << std::endl;
 //	std::cout << "------------------------1：BAYSAC---------------------" << std::endl;
 //	std::cout << "------------------------2：LMEDS---------------------" << std::endl;
@@ -61,38 +61,38 @@ int main()
 
     std::cout << "拟合结束!" << std::endl;
 
-    std::cout << "平面最少点数" << std::endl;
-    int minN;
-    std::cin >> minN;
-    std::cout << "计算挡板中..." << std::endl;
+//    std::cout << "平面最少点数" << std::endl;
+//    int minN;
+//    std::cin >> minN;
+//    std::cout << "计算挡板中..." << std::endl;
 
-    td::Plane normalV;
-    seg.singleFitting(td::Segmentation::RANSAC, normalV);
+//    td::Plane normalV;
+//    seg.singleFitting(td::Segmentation::RANSAC, normalV);
 
-    double n1[3];
-    n1[0] = normalV.getA();
-    n1[1] = normalV.getB();
-    n1[2] = normalV.getC();
-    std::vector<td::Plane> pls;
-    pls = seg.getPlaneModels();
-    std::vector<td::PointCloud> indice = seg.getIndices();
+//    double n1[3];
+//    n1[0] = normalV.getA();
+//    n1[1] = normalV.getB();
+//    n1[2] = normalV.getC();
+//    std::vector<td::Plane> pls;
+//    pls = seg.getPlaneModels();
+//    std::vector<td::PointCloud> indice = seg.getIndices();
 
-    int tagetNum = 0;
-    for(int i = 0; i < pls.size(); i++)
-    {
+//    int tagetNum = 0;
+//    for(int i = 0; i < pls.size(); i++)
+//    {
 
-        if(indice[i].size()< minN)
-            continue;
-        double n2[3];
-        n2[0] = pls[i].getA();
-        n2[1] = pls[i].getB();
-        n2[3] = pls[i].getC();
-        double theta(0);
-        theta = n1[0]*n2[0] + n1[1]*n2[1] + n1[2]*n2[2];
-        if(theta < 1.0)
-            tagetNum++;
-    }
-    std::cout << "共有 " << tagetNum << "块挡板" << std::endl;
+//        if(indice[i].size()< minN)
+//            continue;
+//        double n2[3];
+//        n2[0] = pls[i].getA();
+//        n2[1] = pls[i].getB();
+//        n2[3] = pls[i].getC();
+//        double theta(0);
+//        theta = n1[0]*n2[0] + n1[1]*n2[1] + n1[2]*n2[2];
+//        if(theta < 1.0)
+//            tagetNum++;
+//    }
+//    std::cout << "共有 " << tagetNum << "块挡板" << std::endl;
 
 	std::cout << "输入存储点云文件路径（不能带有空格）" << std::endl;
 	std::cin >> path;
