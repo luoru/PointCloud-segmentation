@@ -10,6 +10,38 @@
 #include "PointIO.h"
 #include "Segmentation.h"
 
+#include <pcl/filters/voxel_grid.h>
+
+void pointCloud2pclPointCloud(const td::PointCloud& cloud, pcl::PointCloud<pcl::PointXYZ>::Ptr& pclCloud)
+{
+    if(!pclCloud->empty())
+    {
+        pclCloud.reset();
+    }
+    for (int i = 0; i < cloud.size(); i++)
+    {
+        pcl::PointXYZ pt;
+        pt.x = cloud[i].x;
+        pt.y = cloud[i].y;
+        pt.z = cloud[i].z;
+        pclCloud->push_back(pt);
+    }
+}
+
+void pclPointCloud2PointCloud(const pcl::PointCloud<pcl::PointXYZ>::Ptr& pclCloud, td::PointCloud& cloud)
+{
+    if(!cloud.empty())
+        cloud.clear();
+    for (int i = 0; i < pclCloud->size(); i++)
+    {
+        td::Point pt;
+        pt.x = pclCloud->at(i).x;
+        pt.y = pclCloud->at(i).y;
+        pt.z = pclCloud->at(i).z;
+        cloud.push_back(pt);
+    }
+}
+
 int main()
 {
 	std::cout << "------------------------分割拟合程序开始运行---------------------"<< std::endl;
@@ -20,8 +52,23 @@ int main()
 
 	td::PointIO ptIO;
 	ptIO.open(path);
-	td::Segmentation seg;
-	seg.setInputCloud(ptIO.getPointCloud());
+
+    td::PointCloud cloud;
+    pcl::PointCloud<pcl::PointXYZ>::Ptr pclCloud(new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr filteredCloud(new pcl::PointCloud<pcl::PointXYZ>);
+    pointCloud2pclPointCloud(ptIO.getPointCloud(), pclCloud);
+    std::cout << "输入抽稀网格大小:" << std::endl;
+    double leafSize(0);
+    std::cin >> leafSize;
+    pcl::VoxelGrid<pcl::PointXYZ> filter;
+    filter.setInputCloud(pclCloud);
+    filter.setLeafSize(leafSize, leafSize, leafSize);
+    filter.filter(*filteredCloud);
+    pclPointCloud2PointCloud(filteredCloud, cloud);
+
+
+    td::Segmentation seg;
+    seg.setInputCloud(cloud);
 
     std::cout << "k邻域值(根据实际点云密度进行选择)" << std::endl;
 	int k;
@@ -50,9 +97,9 @@ int main()
 	clock_t start, end;
 	start = clock();
     std::cout << "拟合中..." <<std::endl;
-//    seg.regionGrow(td::Segmentation::RANSAC, k);
-    seg.multiRansac();
-    //seg.singleFitting(td::Segmentation::RANSAC);
+    seg.regionGrow(td::Segmentation::RANSAC, k);
+//    seg.multiRansac();
+//    seg.singleFitting(td::Segmentation::RANSAC);
 	end = clock();
 //    std::cout << "拟合时间：" << (double)(end - start) / CLOCKS_PER_SEC *1000.0 << "ms" << std::endl;
 //    std::cout << "共拟合" << seg.getModelNum() << "个平面" << std::endl;
